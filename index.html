@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mono</title>
+
+    <link rel="stylesheet" href="public/style.css">
+    <!--<link rel="stylesheet" href="public/style.css">-->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"-->
+            <!--integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"-->
+            <!--crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <script src="./public/index.js"></script>
+    <script src="./node_modules/moment/moment.js"></script>
+
+</head>
+<body>
+<div>
+    <div class='App'>
+        <div class='buttons-container'>
+            <div style="width: 200px;margin: auto">
+                <button  id="showTable" class="btn btn-success">Open Calendar</button>
+            </div>
+        </div>
+
+        <div class='table-content'>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#showTable').on('click', function () {
+            $('.table-content table').remove();
+
+            var dateNow = new Date();
+
+            $.ajax({
+                url: 'http://localhost/index.php',
+                type: "GET",
+                data: {'date': dateNow},
+                dataType: "json",
+                success: function(data){
+                    var heades=[];
+                    var dayInfo=[];
+
+                    for (var i = 0; i < 7; i++) {
+
+                        heades.push(
+                        '<td>'+
+                            '<div class="table-header">'+ moment().add(i, 'days').format('dddd') +'</div>'+
+                        '</td>')
+                    }
+
+
+                    data.forEach(function(item){
+
+                        var description = item.status.active ? '<a>'+item.status.description+'</a>' : '<p>'+item.status.description+'</p>';
+                        var active = item.status.active ? 'active-day' : '';
+
+                        dayInfo.push(
+                            '<td>'+
+                                '<div class="day-info ' + active + '">'+
+                                    '<p>' +item.date+ '</p>'+
+                                     description +
+                                '</div>'+
+                            '</td>')
+
+                    });
+
+
+                    var table = '<table id="table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            heades +
+                                         '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>'+
+                                    '<tr>'+
+                                        dayInfo +
+                                    '</tr>'+
+                    '</tbody>';
+
+                    $('.table-content').append(table)
+
+
+                },
+                error:function(xhr, status, err){
+
+                }
+            })
+            ;
+        })
+    });
+</script>
