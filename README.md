@@ -5,4 +5,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - npm install
 - npm start
 
-![alt text](https://raw.githubusercontent.com/kirill-kuparev/clendar-test/master/public/img/previewPure.png)
+![alt text](https://raw.githubusercontent.com/kirill-kuparev/calendar-test-purejs/master/public/img/previewPure.png)
