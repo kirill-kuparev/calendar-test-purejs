@@ -21,9 +21,11 @@
                 <button id="showTable" class="btn btn-success">Open Calendar</button>
             </div>
         </div>
+        <div class="grid" id="grid">
+            <div class="row" id="table-content">
 
-        <div id='table-content'>
 
+            </div>
         </div>
     </div>
 </div>
@@ -41,14 +43,15 @@
             el.appendChild(div.children[0]);
         }
     }
-    var dateNow = new Date();
+    var dateNow = moment().format('YYYY-MM-DD');
     var button = document.getElementById("showTable");
-    button.addEventListener("click",function(el){
-        if( document.getElementById('table')){
-        document.getElementById('table').parentNode.removeChild( document.getElementById('table') );}
+    button.addEventListener("click",function(){
+        if( document.getElementById('table-content')){
+        document.getElementById('table-content').parentNode.removeChild( document.getElementById('table-content') );
+            appendHtml(document.getElementById('grid'), '<div class="row" id="table-content"></div>');
+        }
 
-            var heades = [];
-            var dayInfo = [];
+            var table = [];
             var data = [];
 
 
@@ -60,44 +63,27 @@
 
                     data = JSON.parse(this.response);
 
-                    for (var i = 0; i < 7; i++) {
 
-                        heades.push(
-                            '<td>' +
-                            '<div class="table-header">' + moment().add(i, 'days').format('dddd') + '</div>' +
-                            '</td>')
-                    }
-
-
-                    data.forEach(function (item) {
+                    data.forEach(function (item,i) {
 
 
                         var description = item.status.active ? '<a>' + item.status.description + '</a>' : '<p>' + item.status.description + '</p>';
                         var active = item.status.active ? 'active-day' : '';
 
-                        dayInfo.push(
-                            '<td>' +
-                                '<div class="day-info ' + active + '">' +
-                                    '<p>' + item.date + '</p>' +
-                                    description +
-                                '</div>' +
-                            '</td>')
+                        table.push(
+
+                                '<div class="col-sm-12 col-md-2 calendar-column">' +
+                                    '<div class="table-header">'+ moment().add(i, 'days').format('dddd')+'</div>' +
+                                    '<div class="day-info '+active+'">'+
+                                        '<p>' + item.date + '</p>' +
+                                        description +
+                                    '</div>'+
+                                '</div>'
+
+                        )
 
                     });
 
-
-                    var table = ('<table id="table">' +
-                        '<thead>' +
-                            '<tr>' +
-                                 heades +
-                             '</tr>' +
-                        '</thead>' +
-                        '<tbody>' +
-                            '<tr>' +
-                                dayInfo +
-                            '</tr>' +
-                        '</tbody>' +
-                    '</table>');
 
                     appendHtml(document.getElementById('table-content'), table)
 
