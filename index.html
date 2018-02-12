@@ -8,18 +8,9 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
-
     <script src="./public/index.js"></script>
-    <script src="./node_modules/moment/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.js"></script>
 
 </head>
 <body>
@@ -27,11 +18,11 @@
     <div class='App'>
         <div class='buttons-container'>
             <div style="width: 200px;margin: auto">
-                <button  id="showTable" class="btn btn-success">Open Calendar</button>
+                <button id="showTable" class="btn btn-success">Open Calendar</button>
             </div>
         </div>
 
-        <div class='table-content'>
+        <div id='table-content'>
 
         </div>
     </div>
@@ -43,68 +34,78 @@
 
 <script>
 
-    $(document).ready(function () {
-        $('#showTable').on('click', function () {
-            $('.table-content table').remove();
+    function appendHtml(el, str) {
+        var div = document.createElement('div');
+        div.innerHTML = str;
+        while (div.children.length > 0) {
+            el.appendChild(div.children[0]);
+        }
+    }
+    var dateNow = new Date();
+    var button = document.getElementById("showTable");
+    button.addEventListener("click",function(el){
+        if( document.getElementById('table')){
+        document.getElementById('table').parentNode.removeChild( document.getElementById('table') );}
 
-            var dateNow = new Date();
+            var heades = [];
+            var dayInfo = [];
+            var data = [];
 
-            $.ajax({
-                url: 'http://localhost/index.php',
-                type: "GET",
-                data: {'date': dateNow},
-                dataType: "json",
-                success: function(data){
-                    var heades=[];
-                    var dayInfo=[];
+
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+
+                if (this.readyState == 4 && this.status == 200) {
+
+                    data = JSON.parse(this.response);
 
                     for (var i = 0; i < 7; i++) {
 
                         heades.push(
-                        '<td>'+
-                            '<div class="table-header">'+ moment().add(i, 'days').format('dddd') +'</div>'+
-                        '</td>')
+                            '<td>' +
+                            '<div class="table-header">' + moment().add(i, 'days').format('dddd') + '</div>' +
+                            '</td>')
                     }
 
 
-                    data.forEach(function(item){
+                    data.forEach(function (item) {
 
-                        var description = item.status.active ? '<a>'+item.status.description+'</a>' : '<p>'+item.status.description+'</p>';
+
+                        var description = item.status.active ? '<a>' + item.status.description + '</a>' : '<p>' + item.status.description + '</p>';
                         var active = item.status.active ? 'active-day' : '';
 
                         dayInfo.push(
-                            '<td>'+
-                                '<div class="day-info ' + active + '">'+
-                                    '<p>' +item.date+ '</p>'+
-                                     description +
-                                '</div>'+
+                            '<td>' +
+                                '<div class="day-info ' + active + '">' +
+                                    '<p>' + item.date + '</p>' +
+                                    description +
+                                '</div>' +
                             '</td>')
 
                     });
 
 
-                    var table = ('<table id="table">'+
-                                    '<thead>'+
-                                        '<tr>'+
-                                            heades +
-                                         '</tr>'+
-                                    '</thead>'+
-                                    '<tbody>'+
-                                        '<tr>'+
-                                            dayInfo +
-                                        '</tr>'+
-                                    '</tbody>'+
-                                '</table>');
+                    var table = ('<table id="table">' +
+                        '<thead>' +
+                            '<tr>' +
+                                 heades +
+                             '</tr>' +
+                        '</thead>' +
+                        '<tbody>' +
+                            '<tr>' +
+                                dayInfo +
+                            '</tr>' +
+                        '</tbody>' +
+                    '</table>');
 
-                    $('.table-content').append(table)
+                    appendHtml(document.getElementById('table-content'), table)
 
-
-                },
-                error:function(xhr, status, err){
-                   console.log('error',err)
                 }
-            })
-            ;
-        })
-    });
+            };
+
+        xmlhttp.open("GET", "http://localhost:3030/public/schedule.php?date="+dateNow, true);
+        xmlhttp.send();
+
+    },false);
 </script>
